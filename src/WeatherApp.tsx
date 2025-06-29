@@ -1,264 +1,162 @@
-// import "./style.css";
-// import { Search, CloudLightning } from "react-feather";
-// import axios from "axios";
-// import { useState, useEffect } from "react";
-
-// export default function Main() {
-//   const [weatherDetails, setWeatherDetails] = useState(null);
-//   const [city, setCity] = useState("");
-//   const [humidity, setHumidity] = useState(null);
-//   const [windSpeed, setWindSpeed] = useState(null);
-
-//   const fetchData = () => {
-//     if (!city) return; // Prevent empty search
-//     axios
-//       .get(
-//         `https://api.weatherapi.com/v1/current.json?key=ecf254c5d6a2430daa0142700250603&q=${city}`
-//       )
-//       .then((res) => {
-//         setWeatherDetails(res.data); // Store API response in state
-//         setHumidity(res.data.current.humidity);
-//         setWindSpeed(res.data.current.wind_kph);
-//       })
-//       .catch((err) => {
-//         console.error("Error fetching weather:", err);
-//         setWeatherDetails(null);
-//       });
-//   };
-
-//   //   useEffect(() => {
-//   //     fetchData(); // Fetch weather data on component mount
-//   //   }, []);
-//   function weatherAppBackgroundColor(C) {
-//     if (!city) {
-//       return "bg-cyan-200";
-//     }
-//     if (C <= -20) {
-//       return "bg-gradient-to-b from-blue-100 to-blue-300"; // Freezing Cold
-//     } else if (C > -20 && C <= 0) {
-//       return "bg-gradient-to-b from-blue-200 to-blue-400"; // Very Cold
-//     } else if (C > 0 && C <= 15) {
-//       return "bg-gradient-to-b from-blue-300 to-green-200"; // Cool
-//     } else if (C > 15 && C <= 25) {
-//       return "bg-gradient-to-b from-green-200 via-yellow-200 to-orange-200"; // Mild
-//     } else if (C > 25 && C <= 35) {
-//       return "bg-gradient-to-b from-yellow-200 via-orange-300 to-red-200"; // Warm
-//     } else if (C > 35 && C <= 45) {
-//       return "bg-gradient-to-b from-orange-200 to-red-300"; // Hot
-//     } else {
-//       return "bg-gradient-to-b from-orange-300 to-red-400"; // Extreme Heat
-//     }
-//   }
-
-//   return (
-//     <div className="h-screen w-screen flex justify-center items-center bg-slate-900">
-//       <div
-//         className={`flex flex-col justify-between items-center rounded-lg py-12 px-4 shadow-lg ${weatherAppBackgroundColor(
-//           weatherDetails?.current?.temp_c
-//         )}`}
-//       >
-//         {/* Search Bar */}
-//         <div className="flex items-center w-full gap-2 text-gray-400">
-//           <input
-//             type="search"
-//             placeholder="Enter city name"
-//             className="px-4 py-2 w-full outline-none rounded-full bg-white"
-//             onChange={(e) => setCity(e.target.value)}
-//           />
-//           <div
-//             className="rounded-full p-2 cursor-pointer bg-white"
-//             onClick={city ? fetchData : null}
-//           >
-//             <Search />
-//           </div>
-//         </div>
-
-//         {/* Weather Icon */}
-//         {city && (
-//           <>
-//             <div className="mt-12">
-//               <div>
-//                 <img
-//                   src={weatherDetails?.current?.condition?.icon}
-//                   width={100}
-//                 />
-//               </div>
-//             </div>
-
-//             {/* Temperature & City */}
-//             <div className="flex flex-col justify-center items-center mt-12">
-//               <h1 className="!text-5xl !font-medium">
-//                 {weatherDetails?.current?.temp_c}
-//                 <sup>°</sup>C
-//               </h1>
-//               <h5 className="!text-2xl !font-medium text-gray-600">
-//                 {weatherDetails?.location?.name}
-//               </h5>
-//             </div>
-
-//             {/* Humidity and Wind Speed */}
-//             <div className="mt-12 flex justify-between w-full px-4">
-//               <div className="flex items-center gap-2">
-//                 <img
-//                   src="https://www.svgrepo.com/show/455067/water.svg"
-//                   width={30}
-//                   alt="Humidity"
-//                 />
-//                 <div className="text-start">
-//                   {humidity && (
-//                     <div className="text-lg font-semibold">{humidity}%</div>
-//                   )}
-//                   <div className="text-gray-700 text-sm">Humidity</div>
-//                 </div>
-//               </div>
-
-//               <div className="flex items-center gap-2">
-//                 <img
-//                   src="https://www.svgrepo.com/show/358416/wind.svg"
-//                   width={30}
-//                   alt="Wind Speed"
-//                 />
-//                 <div className="text-start">
-//                   {windSpeed && (
-//                     <div className="text-lg font-semibold">
-//                       {windSpeed} km/h
-//                     </div>
-//                   )}
-//                   <div className="text-gray-700 text-sm">Wind Speed</div>
-//                 </div>
-//               </div>
-//             </div>
-//           </>
-//         )}
-//       </div>
-//     </div>
-//   );
-// }
-
 import "./style.css";
 import { Search } from "react-feather";
 import axios from "axios";
 import { useState } from "react";
 
+type WeatherDetails = {
+  location: { name: string };
+  current: {
+    temp_c: number;
+    humidity: number;
+    wind_kph: number;
+    condition: { icon: string };
+  };
+};
+
 export default function Main() {
-  const [weatherDetails, setWeatherDetails] = useState(null);
+  const [weatherDetails, setWeatherDetails] = useState<WeatherDetails | null>(
+    null
+  );
   const [city, setCity] = useState("");
-  const [humidity, setHumidity] = useState(null);
-  const [windSpeed, setWindSpeed] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   const fetchData = async () => {
-    if (!city.trim()) return; // Prevent empty search
+    if (!city.trim()) return;
+
     setLoading(true);
+    setError("");
+    setWeatherDetails(null);
 
     try {
       const res = await axios.get(
-        `http://api.weatherapi.com/v1/current.json?key=ecf254c5d6a2430daa0142700250603&q=${city}`
+        `https://api.weatherapi.com/v1/current.json?key=ecf254c5d6a2430daa0142700250603&q=${city}`
       );
       setWeatherDetails(res.data);
-      setHumidity(res.data.current.humidity);
-      setWindSpeed(res.data.current.wind_kph);
-    } catch (error) {
-      console.error("Error fetching data:", error);
+    } catch (err) {
+      setError("No results found");
     } finally {
       setLoading(false);
     }
   };
 
-  function weatherAppBackgroundColor(C) {
-    if (C === undefined) return "bg-gradient-to-b from-blue-300 to-green-300";
-    if (C <= -20) return "bg-gradient-to-b from-blue-100 to-blue-300";
-    if (C > -20 && C <= 0) return "bg-gradient-to-b from-blue-200 to-blue-400";
-    if (C > 0 && C <= 15) return "bg-gradient-to-b from-blue-300 to-green-200";
-    if (C > 15 && C <= 25)
+  function weatherAppBackgroundColor(temp: number | undefined): string {
+    if (temp === undefined)
+      return "bg-gradient-to-b from-blue-300 to-green-300";
+    if (temp <= -20) return "bg-gradient-to-b from-blue-100 to-blue-300";
+    if (temp <= 0) return "bg-gradient-to-b from-blue-200 to-blue-400";
+    if (temp <= 15) return "bg-gradient-to-b from-blue-300 to-green-200";
+    if (temp <= 25)
       return "bg-gradient-to-b from-green-200 via-yellow-200 to-orange-200";
-    if (C > 25 && C <= 35)
+    if (temp <= 35)
       return "bg-gradient-to-b from-yellow-200 via-orange-300 to-red-200";
-    if (C > 35 && C <= 45) return "bg-gradient-to-b from-orange-200 to-red-300";
+    if (temp <= 45) return "bg-gradient-to-b from-orange-200 to-red-300";
     return "bg-gradient-to-b from-orange-300 to-red-400";
   }
 
   return (
-    <div className="h-screen w-screen flex justify-center items-center bg-slate-900">
+    <div className="h-screen w-screen flex justify-center items-center bg-slate-900 px-4">
       <div
-        className={`flex flex-col justify-between items-center rounded-lg py-12 px-4 shadow-lg ${weatherAppBackgroundColor(
+        className={`w-full max-w-xl rounded-2xl shadow-2xl px-6 py-10 flex flex-col items-center gap-6 ${weatherAppBackgroundColor(
           weatherDetails?.current?.temp_c
         )}`}
       >
-        {/* Search Bar */}
-        <div className="flex items-center w-full gap-2 text-gray-400">
+        {/* Heading */}
+        <h1 className="text-3xl font-bold text-black text-center">
+          Weather App
+        </h1>
+
+        {/* Search Section */}
+        <div className="flex w-full items-center gap-2">
           <input
             type="search"
-            placeholder="Enter city name"
-            className="px-4 py-2 w-full outline-none rounded-full bg-white"
+            placeholder="Ex: Hyderabad"
+            className="px-4 py-2 rounded-full w-full bg-white outline-none shadow-md"
             onChange={(e) => {
               const value = e.target.value.trim();
               setCity(value);
-              if (!value) setWeatherDetails(null);
+              if (!value) {
+                setWeatherDetails(null);
+                setError("");
+              }
             }}
           />
-          <div
-            className="rounded-full p-2 cursor-pointer bg-white"
+          <button
             onClick={fetchData}
+            className="bg-white p-2 !rounded-full hover:bg-gray-200 transition"
+            aria-label="Search Weather"
           >
             <Search />
-          </div>
+          </button>
         </div>
 
-        {/* Loading State */}
-        {loading && <p className="text-gray-600">Fetching weather...</p>}
+        {/* Error message below input */}
+        {error && <p className="text-red-600 text-sm mt-[-8px]">{error}</p>}
 
-        {/* Weather Data */}
-        {weatherDetails && !loading && (
-          <>
-            {/* Weather Icon */}
-            <div className="mt-12">
+        {/* Loading */}
+        {loading && (
+          <p className="text-gray-700 text-center">Fetching weather...</p>
+        )}
+
+        {/* Weather Details */}
+        {weatherDetails && !loading && !error ? (
+          weatherDetails.location.name.toLowerCase() !== city.toLowerCase() ? (
+            <div className="flex justify-center items-center h-40">
+              <p className="text-red-600 text-lg font-semibold">
+                No results found
+              </p>
+            </div>
+          ) : (
+            <>
               <img
-                src={weatherDetails?.current?.condition?.icon}
+                src={weatherDetails.current.condition.icon}
                 width={100}
                 alt="Weather Icon"
+                className="mt-4"
               />
-            </div>
 
-            {/* Temperature & City */}
-            <div className="flex flex-col justify-center items-center mt-12">
-              <h1 className="!text-5xl !font-medium">
-                {weatherDetails?.current?.temp_c}
-                <sup>°</sup>C
-              </h1>
-              <h5 className="!text-2xl !font-medium text-gray-600">
-                {weatherDetails?.location?.name}
-              </h5>
-            </div>
-
-            {/* Humidity and Wind Speed */}
-            <div className="mt-12 flex justify-between w-full px-4">
-              <div className="flex items-center gap-2">
-                <img
-                  src="https://www.svgrepo.com/show/455067/water.svg"
-                  width={30}
-                  alt="Humidity"
-                />
-                <div className="text-start">
-                  <div className="text-lg font-semibold">{humidity}%</div>
-                  <div className="text-gray-700 text-sm">Humidity</div>
-                </div>
+              <div className="text-center">
+                <h1 className="text-5xl font-bold">
+                  {weatherDetails.current.temp_c}
+                  <sup>°</sup>C
+                </h1>
+                <h5 className="text-2xl font-medium text-gray-700 mt-1">
+                  {weatherDetails.location.name}
+                </h5>
               </div>
 
-              <div className="flex items-center gap-2">
-                <img
-                  src="https://www.svgrepo.com/show/358416/wind.svg"
-                  width={30}
-                  alt="Wind Speed"
-                />
-                <div className="text-start">
-                  <div className="text-lg font-semibold">{windSpeed} km/h</div>
-                  <div className="text-gray-700 text-sm">Wind Speed</div>
+              <div className="flex justify-between gap-4 mt-8 w-full">
+                <div className="flex items-center gap-3 bg-white p-4 rounded-xl shadow w-1/2">
+                  <img
+                    src="https://www.svgrepo.com/show/455067/water.svg"
+                    width={30}
+                    alt="Humidity"
+                  />
+                  <div>
+                    <p className="text-lg font-semibold text-gray-800">
+                      {weatherDetails.current.humidity}%
+                    </p>
+                    <p className="text-sm text-gray-600">Humidity</p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-3 bg-white p-4 rounded-xl shadow w-1/2">
+                  <img
+                    src="https://www.svgrepo.com/show/358416/wind.svg"
+                    width={30}
+                    alt="Wind Speed"
+                  />
+                  <div>
+                    <p className="text-lg font-semibold text-gray-800">
+                      {weatherDetails.current.wind_kph} km/h
+                    </p>
+                    <p className="text-sm text-gray-600">Wind Speed</p>
+                  </div>
                 </div>
               </div>
-            </div>
-          </>
-        )}
+            </>
+          )
+        ) : null}
       </div>
     </div>
   );
