@@ -4,7 +4,11 @@ import axios from "axios";
 import { useState } from "react";
 
 type WeatherDetails = {
-  location: { name: string };
+  location: {
+    name: string;
+    region: string;
+    country: string;
+  };
   current: {
     temp_c: number;
     humidity: number;
@@ -22,7 +26,8 @@ export default function Main() {
   const [error, setError] = useState("");
 
   const fetchData = async () => {
-    if (!city.trim()) return;
+    const trimmedCity = city.trim();
+    if (!trimmedCity) return;
 
     setLoading(true);
     setError("");
@@ -30,7 +35,7 @@ export default function Main() {
 
     try {
       const res = await axios.get(
-        `https://api.weatherapi.com/v1/current.json?key=ecf254c5d6a2430daa0142700250603&q=${city}`
+        `https://api.weatherapi.com/v1/current.json?key=ecf254c5d6a2430daa0142700250603&q=${trimmedCity}`
       );
       setWeatherDetails(res.data);
     } catch (err) {
@@ -90,73 +95,66 @@ export default function Main() {
           </button>
         </div>
 
-        {/* Error message below input */}
+        {/* Error message */}
         {error && <p className="text-red-600 text-sm mt-[-8px]">{error}</p>}
 
-        {/* Loading */}
+        {/* Loading message */}
         {loading && (
           <p className="text-gray-700 text-center">Fetching weather...</p>
         )}
 
         {/* Weather Details */}
-        {weatherDetails && !loading && !error ? (
-          weatherDetails.location.name.toLowerCase() !== city.toLowerCase() ? (
-            <div className="flex justify-center items-center h-40">
-              <p className="text-red-600 text-lg font-semibold">
-                No results found
-              </p>
+        {weatherDetails && !loading && !error && (
+          <>
+            <img
+              src={weatherDetails.current.condition.icon}
+              width={100}
+              alt="Weather Icon"
+              className="mt-4"
+            />
+
+            <div className="text-center">
+              <h1 className="text-5xl font-bold">
+                {weatherDetails.current.temp_c}
+                <sup>°</sup>C
+              </h1>
+              <h5 className="text-2xl font-medium text-gray-700 mt-1">
+                {weatherDetails.location.name}, {weatherDetails.location.region}
+                , {weatherDetails.location.country}
+              </h5>
             </div>
-          ) : (
-            <>
-              <img
-                src={weatherDetails.current.condition.icon}
-                width={100}
-                alt="Weather Icon"
-                className="mt-4"
-              />
 
-              <div className="text-center">
-                <h1 className="text-5xl font-bold">
-                  {weatherDetails.current.temp_c}
-                  <sup>°</sup>C
-                </h1>
-                <h5 className="text-2xl font-medium text-gray-700 mt-1">
-                  {weatherDetails.location.name}
-                </h5>
-              </div>
-
-              <div className="flex justify-between gap-4 mt-8 w-full">
-                <div className="flex items-center gap-3 bg-white p-4 rounded-xl shadow w-1/2">
-                  <img
-                    src="https://www.svgrepo.com/show/455067/water.svg"
-                    width={30}
-                    alt="Humidity"
-                  />
-                  <div>
-                    <p className="text-lg font-semibold text-gray-800">
-                      {weatherDetails.current.humidity}%
-                    </p>
-                    <p className="text-sm text-gray-600">Humidity</p>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-3 bg-white p-4 rounded-xl shadow w-1/2">
-                  <img
-                    src="https://www.svgrepo.com/show/358416/wind.svg"
-                    width={30}
-                    alt="Wind Speed"
-                  />
-                  <div>
-                    <p className="text-lg font-semibold text-gray-800">
-                      {weatherDetails.current.wind_kph} km/h
-                    </p>
-                    <p className="text-sm text-gray-600">Wind Speed</p>
-                  </div>
+            <div className="flex justify-between gap-4 mt-8 w-full">
+              <div className="flex items-center gap-3 bg-white p-4 rounded-xl shadow w-1/2">
+                <img
+                  src="https://www.svgrepo.com/show/455067/water.svg"
+                  width={30}
+                  alt="Humidity"
+                />
+                <div>
+                  <p className="text-lg font-semibold text-gray-800">
+                    {weatherDetails.current.humidity}%
+                  </p>
+                  <p className="text-sm text-gray-600">Humidity</p>
                 </div>
               </div>
-            </>
-          )
-        ) : null}
+
+              <div className="flex items-center gap-3 bg-white p-4 rounded-xl shadow w-1/2">
+                <img
+                  src="https://www.svgrepo.com/show/358416/wind.svg"
+                  width={30}
+                  alt="Wind Speed"
+                />
+                <div>
+                  <p className="text-lg font-semibold text-gray-800">
+                    {weatherDetails.current.wind_kph} km/h
+                  </p>
+                  <p className="text-sm text-gray-600">Wind Speed</p>
+                </div>
+              </div>
+            </div>
+          </>
+        )}
       </div>
     </div>
   );
