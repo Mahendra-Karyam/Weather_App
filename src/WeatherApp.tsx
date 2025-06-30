@@ -60,43 +60,54 @@ export default function Main() {
   }
 
   return (
-    <div className="h-screen w-screen flex justify-center items-center bg-slate-900 px-4">
+    <div className="min-h-screen w-screen overflow-auto flex justify-center items-center bg-slate-900 px-4 py-6 font-['Times-New-Roman']">
       <div
         className={`w-full max-w-xl rounded-2xl shadow-2xl px-6 py-10 flex flex-col items-center gap-6 ${weatherAppBackgroundColor(
           weatherDetails?.current?.temp_c
         )}`}
       >
         {/* Heading */}
-        <h1 className="text-3xl font-bold text-black text-center">
+        <h1 className="!text-4xl !font-bold text-black text-center">
           Weather App
         </h1>
 
         {/* Search Section */}
-        <div className="flex w-full items-center gap-2">
+        <form
+          className="flex w-full items-center gap-2"
+          onSubmit={(e) => {
+            e.preventDefault();
+            fetchData();
+          }}
+        >
           <input
             type="search"
-            placeholder="Ex: Hyderabad"
+            placeholder="Search by city, state, or country"
+            autoFocus // 🔍 Automatically focuses here when the page loads, so the user can start typing immediately without clicking.
             className="px-4 py-2 rounded-full w-full bg-white outline-none shadow-md"
             onChange={(e) => {
-              const value = e.target.value.trim();
-              setCity(value);
-              if (!value) {
+              setCity(e.target.value);
+              if (!e.target.value.trim()) {
                 setWeatherDetails(null);
                 setError("");
               }
             }}
+            value={city}
           />
           <button
-            onClick={fetchData}
+            type="submit"
             className="bg-white p-2 !rounded-full hover:bg-gray-200 transition"
             aria-label="Search Weather"
           >
             <Search />
           </button>
-        </div>
+        </form>
 
         {/* Error message */}
-        {error && <p className="text-red-600 text-sm mt-[-8px]">{error}</p>}
+        {error && !loading && (
+          <div className="flex justify-center items-center h-40">
+            <p className="text-red-600 text-lg font-semibold">{error}</p>
+          </div>
+        )}
 
         {/* Loading message */}
         {loading && (
@@ -124,8 +135,8 @@ export default function Main() {
               </h5>
             </div>
 
-            <div className="flex justify-between gap-4 mt-8 w-full">
-              <div className="flex items-center gap-3 bg-white p-4 rounded-xl shadow w-1/2">
+            <div className="flex flex-col sm:flex-row justify-between gap-4 mt-8 w-full">
+              <div className="flex items-center gap-3 bg-white p-4 rounded-xl shadow w-full sm:w-1/2">
                 <img
                   src="https://www.svgrepo.com/show/455067/water.svg"
                   width={30}
@@ -139,7 +150,7 @@ export default function Main() {
                 </div>
               </div>
 
-              <div className="flex items-center gap-3 bg-white p-4 rounded-xl shadow w-1/2">
+              <div className="flex items-center gap-3 bg-white p-4 rounded-xl shadow w-full sm:w-1/2">
                 <img
                   src="https://www.svgrepo.com/show/358416/wind.svg"
                   width={30}
