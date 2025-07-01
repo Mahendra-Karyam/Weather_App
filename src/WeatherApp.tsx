@@ -60,14 +60,14 @@ export default function Main() {
   }
 
   return (
-    <div className="min-h-screen w-screen overflow-auto flex justify-center items-center bg-slate-900 px-4 py-6 font-['Times-New-Roman']">
+    <div className="h-screen w-screen flex justify-center items-center bg-slate-900 px-2 py-2 font-['Times-New-Roman']">
       <div
-        className={`w-full max-w-xl rounded-2xl shadow-2xl px-6 py-10 flex flex-col items-center gap-6 ${weatherAppBackgroundColor(
+        className={`w-full max-w-xl rounded-2xl shadow-xl px-4 py-6 flex flex-col items-center gap-4 ${weatherAppBackgroundColor(
           weatherDetails?.current?.temp_c
         )}`}
       >
         {/* Heading */}
-        <h1 className="!text-4xl !font-bold text-black text-center">
+        <h1 className="text-3xl font-bold text-black text-center">
           Weather App
         </h1>
 
@@ -81,9 +81,9 @@ export default function Main() {
         >
           <input
             type="search"
-            placeholder="Search by city, state, or country"
+            placeholder="Search city or country"
             autoFocus // 🔍 Automatically focuses here when the page loads, so the user can start typing immediately without clicking.
-            className="px-4 py-2 rounded-full w-full bg-white outline-none shadow-md"
+            className="px-3 py-1.5 rounded-full w-full bg-white outline-none shadow"
             onChange={(e) => {
               setCity(e.target.value);
               if (!e.target.value.trim()) {
@@ -104,14 +104,14 @@ export default function Main() {
 
         {/* Error message */}
         {error && !loading && (
-          <div className="flex justify-center items-center h-40">
-            <p className="text-red-600 text-lg font-semibold">{error}</p>
-          </div>
+          <p className="text-red-600 text-base font-semibold">{error}</p>
         )}
 
         {/* Loading message */}
         {loading && (
-          <p className="text-gray-700 text-center">Fetching weather...</p>
+          <p className="text-gray-700 text-center text-sm">
+            Fetching weather...
+          </p>
         )}
 
         {/* Weather Details */}
@@ -119,48 +119,48 @@ export default function Main() {
           <>
             <img
               src={weatherDetails.current.condition.icon}
-              width={100}
+              width={70}
               alt="Weather Icon"
-              className="mt-4"
+              className="mt-2"
             />
 
             <div className="text-center">
-              <h1 className="text-5xl font-bold">
+              <h1 className="text-4xl font-bold">
                 {weatherDetails.current.temp_c}
                 <sup>°</sup>C
               </h1>
-              <h5 className="text-2xl font-medium text-gray-700 mt-1">
+              <h5 className="text-lg font-medium text-gray-700 mt-1">
                 {weatherDetails.location.name}, {weatherDetails.location.region}
                 , {weatherDetails.location.country}
               </h5>
             </div>
 
-            <div className="flex flex-col sm:flex-row justify-between gap-4 mt-8 w-full">
-              <div className="flex items-center gap-3 bg-white p-4 rounded-xl shadow w-full sm:w-1/2">
+            <div className="flex flex-col sm:flex-row justify-between gap-2 mt-4 w-full">
+              <div className="flex items-center gap-2 bg-white p-2 rounded-lg shadow w-full sm:w-1/2">
                 <img
                   src="https://www.svgrepo.com/show/455067/water.svg"
-                  width={30}
+                  width={24}
                   alt="Humidity"
                 />
                 <div>
-                  <p className="text-lg font-semibold text-gray-800">
+                  <p className="text-base font-semibold text-gray-800">
                     {weatherDetails.current.humidity}%
                   </p>
-                  <p className="text-sm text-gray-600">Humidity</p>
+                  <p className="text-xs text-gray-600">Humidity</p>
                 </div>
               </div>
 
-              <div className="flex items-center gap-3 bg-white p-4 rounded-xl shadow w-full sm:w-1/2">
+              <div className="flex items-center gap-2 bg-white p-2 rounded-lg shadow w-full sm:w-1/2">
                 <img
                   src="https://www.svgrepo.com/show/358416/wind.svg"
-                  width={30}
+                  width={24}
                   alt="Wind Speed"
                 />
                 <div>
-                  <p className="text-lg font-semibold text-gray-800">
+                  <p className="text-base font-semibold text-gray-800">
                     {weatherDetails.current.wind_kph} km/h
                   </p>
-                  <p className="text-sm text-gray-600">Wind Speed</p>
+                  <p className="text-xs text-gray-600">Wind Speed</p>
                 </div>
               </div>
             </div>
