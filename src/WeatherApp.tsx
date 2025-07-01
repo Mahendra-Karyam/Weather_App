@@ -60,9 +60,9 @@ export default function Main() {
   }
 
   return (
-    <div className="h-screen w-screen flex justify-center items-center bg-slate-900 px-2 py-2 font-['Times-New-Roman']">
+    <div className="min-h-screen w-screen flex justify-center items-center bg-slate-900 overflow-hidden font-['Times-New-Roman']">
       <div
-        className={`w-full max-w-xl max-h-screen overflow-y-auto rounded-2xl shadow-xl px-4 py-4 flex flex-col items-center gap-4 ${weatherAppBackgroundColor(
+        className={`w-full max-w-xl max-h-[95vh] overflow-y-auto rounded-2xl shadow-xl px-4 py-4 flex flex-col items-center gap-4 ${weatherAppBackgroundColor(
           weatherDetails?.current?.temp_c
         )}`}
       >
@@ -82,7 +82,7 @@ export default function Main() {
           <input
             type="search"
             placeholder="Search city or country"
-            autoFocus // 🔍 Automatically focuses here when the page loads, so the user can start typing immediately without clicking.
+            autoFocus
             className="px-3 py-1.5 rounded-full w-full bg-white outline-none shadow"
             onChange={(e) => {
               setCity(e.target.value);
@@ -130,8 +130,9 @@ export default function Main() {
                 <sup>°</sup>C
               </h1>
               <h5 className="text-lg font-medium text-gray-700 mt-1">
-                {weatherDetails.location.name}, {weatherDetails.location.region}
-                , {weatherDetails.location.country}
+                {weatherDetails.location.name},{" "}
+                {weatherDetails.location.region},{" "}
+                {weatherDetails.location.country}
               </h5>
             </div>
 
