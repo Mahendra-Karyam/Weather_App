@@ -62,7 +62,7 @@ export default function Main() {
   return (
     <div className="h-screen w-screen flex justify-center items-center bg-slate-900 px-2 py-2 font-['Times-New-Roman']">
       <div
-        className={`w-full max-w-xl rounded-2xl shadow-xl px-4 py-6 flex flex-col items-center gap-4 ${weatherAppBackgroundColor(
+        className={`w-full max-w-xl max-h-screen overflow-y-auto rounded-2xl shadow-xl px-4 py-4 flex flex-col items-center gap-4 ${weatherAppBackgroundColor(
           weatherDetails?.current?.temp_c
         )}`}
       >
